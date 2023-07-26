@@ -1,13 +1,28 @@
 class sysctl::params {
-
   # Keep the original symlink if we purge, to avoid ping-pong with initscripts
   if ($::osfamily == 'RedHat' and
-      versioncmp($::operatingsystemmajrelease, '7') >= 0) or
-     ($::osfamily == 'Debian' and
-      versioncmp($::operatingsystemmajrelease, '8') >= 0) {
+  versioncmp($::operatingsystemmajrelease, '7') >= 0) or
+  ($::osfamily == 'Debian' and
+  versioncmp($::operatingsystemmajrelease, '8') >= 0) {
     $symlink99 = true
   } else {
     $symlink99 = false
+  }
+
+  case $::osfamily {
+    'RedHat': {
+      if versioncmp($::operatingsystemmajrelease, '7') {
+        $symlink99 = true
+      }
+    }
+    'Debian': {
+      if (versioncmp($::operatingsystemmajrelease, '8') >= 0) or
+      (versioncmp($::operatingsystemmajrelease, '11') >= 0) {
+        $symlink99 = true
+      } else {
+        $symlink99 = false
+      }
+    }
   }
 
   case $::osfamily {
@@ -22,6 +37,4 @@ class sysctl::params {
       $sysctl_dir_mode = '0755'
     }
   }
-
 }
-
